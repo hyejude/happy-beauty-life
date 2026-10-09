@@ -1,0 +1,100 @@
+html, body {
+
+background-color: #f2f4f6;
+
+color: #191f28;
+
+font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+height: 100vh;
+
+margin: 0;
+
+padding: 0;
+
+overflow: hidden;
+
+}
+
+.no-scrollbar::-webkit-scrollbar {
+
+display: none;
+
+}
+
+.no-scrollbar {
+
+-ms-overflow-style: none;
+
+scrollbar-width: none;
+
+}
+
+body.dark-mode {
+
+background-color: #11151b;
+
+color: #f2f4f6;
+
+}
+
+#app-shell.dark-mode {
+
+background-color: #1c232c;
+
+color: #f2f4f6;
+
+}
+
+#app-shell.dark-mode .bg-white,
+#app-shell.dark-mode [class~="bg-white/95"],
+#app-shell.dark-mode [class~="bg-white/80"] {
+
+background-color: #252d38;
+
+}
+
+#app-shell.dark-mode .bg-toss-grey5,
+#app-shell.dark-mode .bg-toss-grey4,
+#app-shell.dark-mode [class~="bg-[#FFF3F0]"],
+#app-shell.dark-mode [class~="bg-toss-blue/10"],
+#app-shell.dark-mode .bg-amber-50 {
+
+background-color: #333d4b;
+
+}
+
+#app-shell.dark-mode .text-toss-dark,
+#app-shell.dark-mode .text-toss-grey1 {
+
+color: #f2f4f6;
+
+}
+
+#app-shell.dark-mode .text-toss-grey2 {
+
+color: #c3cad3;
+
+}
+
+#app-shell.dark-mode .text-toss-grey3 {
+
+color: #9aa5b1;
+
+}
+
+#app-shell.dark-mode .border-toss-grey4,
+#app-shell.dark-mode [class~="border-toss-grey4/30"],
+#app-shell.dark-mode [class~="border-toss-grey4/40"],
+#app-shell.dark-mode [class~="border-toss-grey4/60"],
+#app-shell.dark-mode [class~="divide-toss-grey4/60"] {
+
+border-color: #46515f;
+
+}
+
+#app-shell.dark-mode .shadow-toss-card {
+
+box-shadow: 0 2px 12px rgba(0, 0, 0, 0.22);
+
+}

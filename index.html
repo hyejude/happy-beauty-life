@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>행코위 - 내 화장대</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+#vanity-form select {
+  appearance: none;
+  padding-right: 2.25rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='m5 7.5 5 5 5-5' stroke='%238b95a1' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 1rem 1rem;
+  background-position: right 0.75rem center;
+}
+#con-form-store,
+.month-picker-select {
+  appearance: none;
+  padding-right: 2.25rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='m5 7.5 5 5 5-5' stroke='%238b95a1' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 1rem 1rem;
+  background-position: right 0.75rem center;
+}
+</style>
+
+<script>
+
+tailwind.config = {
+
+theme: {
+
+extend: {
+
+colors: {
+
+'toss-blue': '#F76A6A',
+
+'toss-bg': '#ffffff',
+
+'toss-dark': '#191f28',
+
+'toss-grey1': '#333d4b',
+
+'toss-grey2': '#4e5968',
+
+'toss-grey3': '#8b95a1',
+
+'toss-grey4': '#e5e8eb',
+
+'toss-grey5': '#f2f4f6',
+
+'toss-pink': '#FB9280'
+
+},
+
+boxShadow: {
+
+'toss-card': '0 2px 12px rgba(0, 0, 0, 0.04)',
+
+'toss-float': '0 4px 20px rgba(247, 106, 106, 0.15)',
+
+'toss-modal': '0 -4px 24px rgba(0, 0, 0, 0.08)'
+
+}
+
+}
+
+}
+
+}
+
+</script>
+
+<link rel="stylesheet" href="styles.css">
+
+</head>
+
+<body class="flex items-center justify-center select-none">
+
+<div id="app-shell" style="visibility:hidden" class="w-full max-w-md h-full sm:h-[844px] bg-white sm:rounded-[40px] sm:shadow-2xl relative flex flex-col overflow-hidden sm:border-[8px] sm:border-toss-dark">
+
+<!-- Header -->
+<header class="shrink-0 bg-white/95 backdrop-blur-md px-5 pt-5 pb-3 flex items-center justify-between border-b border-toss-grey4/40 z-30">
+  <div>
+    <h1 class="text-xl font-bold tracking-tight text-toss-dark flex items-center gap-2">
+      <span>💄 행코위</span>
+      <span id="header-badge" class="text-xs px-2 py-0.5 rounded-full bg-toss-blue/10 text-toss-blue font-semibold">내 화장대</span>
+    </h1>
+    <p id="header-subtitle" class="text-xs text-toss-grey2 font-medium mt-0.5">있잘쓰! 있는거 잘 쓰자</p>
+  </div>
+
+  <!-- Header actions -->
+  <div class="flex items-center gap-2">
+    <button onclick="openKodeokRulesModal()" class="h-9 px-3 rounded-full bg-toss-blue/10 flex items-center justify-center text-toss-blue hover:text-toss-dark transition text-[10px] font-bold whitespace-nowrap" title="코덕 n계명">
+      코덕 n계명
+    </button>
+    <button onclick="openBackupModal()" class="w-9 h-9 rounded-full bg-toss-grey5 flex items-center justify-center text-toss-grey2 hover:text-toss-dark transition" title="데이터 백업/복구">
+      <i class="fa-solid fa-cloud-arrow-down text-sm"></i>
+    </button>
+  </div>
+</header>
+
+<!-- Tab Content Container -->
+<div id="tab-content-container" class="flex-1 flex flex-col overflow-hidden relative">
+
+  <!-- Search & Filter Section (Only for 내 화장대 & 위시) -->
+  <div id="vanity-filter-section" class="shrink-0 px-5 pt-4 pb-3 bg-white border-b border-toss-grey4/30 space-y-3 z-20">
+    <!-- Search Bar -->
+    <div class="relative flex items-center">
+      <i class="fa-solid fa-magnifying-glass absolute left-3.5 text-toss-grey3 text-sm"></i>
+      <input type="text" id="search-input" oninput="handleSearch(this.value)" placeholder="브랜드, 제품명, 컬러, 태그 검색..."
+        class="w-full h-11 pl-10 pr-10 rounded-2xl bg-toss-grey5 text-toss-dark text-sm font-medium border-none outline-none focus:ring-2 focus:ring-toss-blue/50 transition">
+      <button onclick="clearSearch()" id="search-clear-btn" class="absolute right-3.5 text-toss-grey3 hidden hover:text-toss-dark">
+        <i class="fa-solid fa-circle-xmark text-sm"></i>
+      </button>
+    </div>
+
+    <!-- Main Category Tabs -->
+    <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1" id="main-cat-tabs">
+      <button onclick="selectMainCategory('전체')" class="main-tab px-3.5 py-1.5 rounded-xl text-xs font-bold transition shrink-0 bg-toss-dark text-white">전체</button>
+      <button onclick="selectMainCategory('기초')" class="main-tab px-3.5 py-1.5 rounded-xl text-xs font-bold transition shrink-0 bg-toss-grey5 text-toss-grey2 hover:text-toss-dark">기초</button>
+      <button onclick="selectMainCategory('베이스')" class="main-tab px-3.5 py-1.5 rounded-xl text-xs font-bold transition shrink-0 bg-toss-grey5 text-toss-grey2 hover:text-toss-dark">베이스</button>
+      <button onclick="selectMainCategory('색조')" class="main-tab px-3.5 py-1.5 rounded-xl text-xs font-bold transition shrink-0 bg-toss-grey5 text-toss-grey2 hover:text-toss-dark">색조</button>
+      <button onclick="selectMainCategory('도구')" class="main-tab px-3.5 py-1.5 rounded-xl text-xs font-bold transition shrink-0 bg-toss-grey5 text-toss-grey2 hover:text-toss-dark">도구</button>
+    </div>
+
+    <!-- Sub Category Horizontal Swipe Bar -->
+    <div id="sub-cat-container" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1">
+      <!-- Dynamically rendered subcategory chips -->
+    </div>
+
+    <!-- Status Filter & Mix Action Bar -->
+    <div class="flex items-center justify-between pt-1">
+      <!-- Status Filter Tabs (Vanity only) -->
+      <div id="status-filter-wrap" class="flex items-center gap-1 bg-toss-grey5 p-1 rounded-xl">
+        <button onclick="setStatusFilter('전체')" class="status-tab px-2.5 py-1 rounded-lg text-[11px] font-bold transition bg-white text-toss-dark shadow-2xs">전체</button>
+        <button onclick="setStatusFilter('개봉')" class="status-tab px-2.5 py-1 rounded-lg text-[11px] font-bold transition text-toss-grey2">개봉</button>
+        <button onclick="setStatusFilter('미개봉')" class="status-tab px-2.5 py-1 rounded-lg text-[11px] font-bold transition text-toss-grey2">미개봉</button>
+      </div>
+
+      <!-- Mix Recommendation Buttons (Vanity only) -->
+      <div id="mix-action-buttons" class="flex items-center gap-1.5">
+        <button onclick="openMixConfigModal('립')" class="px-3 py-1.5 rounded-full text-xs font-bold bg-[#FFF3F0] text-toss-blue hover:bg-[#FFE5E0] transition flex items-center gap-1 shrink-0 shadow-2xs">
+          <i class="fa-solid fa-wand-magic-sparkles text-[10px]"></i> 립 섞발
+        </button>
+        <button onclick="openMixConfigModal('블러셔')" class="px-3 py-1.5 rounded-full text-xs font-bold bg-amber-50 text-amber-600 hover:bg-amber-100 transition flex items-center gap-1 shrink-0 shadow-2xs">
+          <i class="fa-solid fa-palette text-[10px]"></i> 블러셔 섞발
+        </button>
+      </div>
+    </div>
+
+    <!-- Dynamic Item Count Indicator -->
+    <div class="flex items-center justify-between px-1 pt-1">
+      <span class="text-xs font-semibold text-toss-grey2" id="filter-count-label">전체 <span class="text-toss-blue font-bold">0</span></span>
+      <div class="flex items-center gap-1.5">
+        <button id="favorite-filter-btn" onclick="toggleFavoriteFilter()" class="px-2.5 py-1 rounded-lg text-[11px] font-bold text-toss-grey2 bg-toss-grey5">♡ 찜만 보기</button>
+        <button id="new-filter-btn" onclick="toggleNewFilter()" class="px-2.5 py-1 rounded-lg text-[11px] font-bold text-toss-grey2 bg-toss-grey5">✨ 이번 주 신상</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content List (Scrollable Area) -->
+  <main class="flex-1 overflow-y-auto px-5 py-3 space-y-3 bg-white pb-24" id="vanity-list-container">
+    <!-- Dynamic Vanity/Wish Cards Rendered Here -->
+  </main>
+
+  <!-- Empty State -->
+  <div id="empty-state" class="hidden flex-col items-center justify-center py-16 px-5 text-center flex-1 overflow-y-auto">
+    <div class="w-16 h-16 rounded-3xl bg-toss-grey5 flex items-center justify-center text-2xl text-toss-grey3 mb-3">
+      <i class="fa-solid fa-box-open"></i>
+    </div>
+    <h3 class="text-sm font-bold text-toss-dark">등록된 항목이 없어요</h3>
+    <p class="text-xs text-toss-grey2 mt-1">우측 하단 + 버튼을 눌러 채워보세요!</p>
+  </div>
+
+  <!-- Other Tabs Placeholder Content (Scrollable Area) -->
+  <div id="other-tab-content" class="hidden flex-1 flex-col py-6 px-5 bg-white space-y-6 overflow-y-auto pb-24">
+    <!-- Rendered dynamically for Home, Wish, Consumption, My Page -->
+  </div>
+</div>
+
+<!-- Floating Add Button Inside Container -->
+<button onclick="openAddModal()" id="floating-add-btn" class="absolute bottom-20 right-6 z-40 w-14 h-14 bg-toss-blue hover:bg-[#E05555] text-white rounded-full shadow-toss-float flex items-center justify-center text-xl active:scale-95 transition" title="등록">
+  <i class="fa-solid fa-plus"></i>
+</button>
+
+<!-- Bottom Navigation Bar -->
+<nav class="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-toss-grey4/60 px-2 py-2 z-40 flex items-center justify-around shadow-lg shrink-0">
+  <button onclick="switchTab('내 화장대')" id="nav-btn-내 화장대" class="flex flex-col items-center gap-1 py-1 px-3 text-toss-blue transition">
+    <i class="fa-solid fa-pump-soap text-base"></i>
+    <span class="text-[10px] font-bold">내 화장대</span>
+  </button>
+  <button onclick="switchTab('위시')" id="nav-btn-위시" class="flex flex-col items-center gap-1 py-1 px-3 text-toss-grey3 hover:text-toss-dark transition">
+    <i class="fa-solid fa-heart text-base"></i>
+    <span class="text-[10px] font-semibold">위시</span>
+  </button>
+  <button onclick="switchTab('홈')" id="nav-btn-홈" class="flex flex-col items-center gap-1 py-1 px-3 text-toss-grey3 hover:text-toss-dark transition">
+    <i class="fa-solid fa-house text-base"></i>
+    <span class="text-[10px] font-semibold">홈</span>
+  </button>
+  <button onclick="switchTab('소비 기록')" id="nav-btn-소비 기록" class="flex flex-col items-center gap-1 py-1 px-3 text-toss-grey3 hover:text-toss-dark transition">
+    <i class="fa-solid fa-receipt text-base"></i>
+    <span class="text-[10px] font-semibold">소비 기록</span>
+  </button>
+  <button onclick="switchTab('마이 페이지')" id="nav-btn-마이 페이지" class="flex flex-col items-center gap-1 py-1 px-3 text-toss-grey3 hover:text-toss-dark transition">
+    <i class="fa-solid fa-user text-base"></i>
+    <span class="text-[10px] font-semibold">마이 페이지</span>
+  </button>
+</nav>
+
+<!-- Modal: Add / Edit Product / Wish -->
+<div id="add-modal" onclick="handleBackdropClick(event, 'add-modal')" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-end sm:items-center justify-center hidden opacity-0 transition-opacity duration-300 p-0 sm:p-4">
+  <div class="w-full sm:max-w-sm bg-white rounded-t-[32px] sm:rounded-3xl p-5 sm:p-6 shadow-toss-modal transform translate-y-full sm:translate-y-0 sm:scale-95 transition-all duration-300 max-h-[85vh] flex flex-col mx-auto box-border">
+
+    <!-- Modal Header (Fixed) -->
+    <div class="shrink-0 flex items-center justify-between pb-4 border-b border-toss-grey4/40 mb-4">
+      <div class="w-10 h-1 bg-toss-grey4 rounded-full mx-auto absolute left-1/2 transform -translate-x-1/2 top-2 sm:hidden"></div>
+      <h2 class="text-base sm:text-lg font-bold text-toss-dark pt-2 sm:pt-0" id="modal-form-title">등록</h2>
+      <button onclick="closeAddModal()" class="w-8 h-8 rounded-full bg-toss-grey5 text-toss-grey2 flex items-center justify-center hover:text-toss-dark pt-2 sm:pt-0">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <!-- Modal Body (Scrollable) -->
+    <div class="flex-1 overflow-y-auto no-scrollbar px-1">
+      <form id="vanity-form" onsubmit="handleFormSubmit(event)" class="space-y-4 pb-6">
+        <input type="hidden" id="edit-item-id" value="" />
+
+        <!-- Smart Import Box (Only for Vanity) -->
+        <div id="smart-import-box" class="p-3 bg-toss-grey5 border border-toss-grey4 rounded-2xl space-y-2 box-border">
+          <div class="flex items-center justify-between">
+            <label class="text-xs font-bold text-toss-grey1 flex items-center gap-1.5">
+              <span>제품 스마트 자동입력</span>
+            </label>
+          </div>
+          <p class="text-[11px] text-toss-grey2 leading-tight">
+            상품명에서 브랜드, 제품명, 분류를 찾아 입력합니다. 상품 링크는 직접 읽을 수 없어요.
+          </p>
+          <div class="flex gap-2 w-full">
+            <input type="text" id="smart-import-input" placeholder="브랜드와 제품명 입력..."
+              class="flex-1 min-w-0 h-9 px-3 rounded-xl bg-white text-toss-dark text-xs font-medium border border-toss-grey4 outline-none focus:ring-2 focus:ring-toss-blue box-border" />
+            <button type="button" onclick="runSmartImport()" class="px-3 h-9 bg-toss-blue hover:bg-[#E05555] text-white rounded-xl text-xs font-bold shrink-0 active:scale-95 transition box-border">
+              자동 추출
+            </button>
+          </div>
+        </div>
+
+        <!-- Main Category -->
+        <div class="space-y-1.5">
+          <label class="text-xs font-bold text-toss-grey1">대분류</label>
+          <select id="form-main-cat" onchange="onFormMainCatChange()" class="w-full h-11 px-3 rounded-xl bg-toss-grey5 text-toss-dark text-xs font-semibold border-none outline-none focus:ring-2 focus:ring-toss-blue/50">
+            <option value="기초">기초</option>
+            <option value="베이스">베이스</option>
+            <option value="색조">색조</option>
+            <option value="도구">도구</option>
+          </select>
+        </div>
+
+        <!-- Sub Category -->
+        <div class="space-y-1.5">
+          <label class="text-xs font-bold text-toss-grey1">소분류</label>
+          <select id="form-sub-cat" onchange="updateFormCategoryOptions()" class="w-full h-11 px-3 rounded-xl bg-toss-grey5 text-toss-dark text-xs font-semibold border-none outline-none focus:ring-2 focus:ring-toss-blue/50">
+            <!-- Dynamically populated -->
+          </select>
+        </div>
+
+        <!-- Brand & Name -->
+        <div class="grid grid-cols-2 gap-3">
+          <div class="space-y-1.5">
+            <label class="text-xs font-bold text-toss-grey1">브랜드명 *</label>
+            <input type="text" id="form-brand" required placeholder="예: 롬앤"
+              class="w-full min-w-0 h-11 px-3 rounded-xl bg-toss-grey5 text-toss-dark text-xs font-medium border-none outline-none focus:ring-2 focus:ring-toss-blue/50 box-border">
+          </div>
+          <div class="space-y-1.5 min-w-0">
+            <label class="text-xs font-bold text-toss-grey1">제품명 *</label>
+            <input type="text" id="form-name" required placeholder="예: 쥬시 래스팅 틴트"
+              class="w-full min-w-0 h-11 px-3 rounded-xl bg-toss-grey5 text-toss-dark text-xs font-medium border-none outline-none focus:ring-2 focus:ring-toss-blue/50 box-border">
+          </div>
+        </div>
+
+        <!-- Color / Shade & Count (Vanity) -->
+        <div class="grid grid-cols-3 gap-3" id="form-standard-row">
+          <div class="col-span-2 space-y-1.5">
+            <label class="text-xs font-bold text-toss-grey1">컬러 / 호수</label>
+            <input type="text" id="form-color" placeholder="예: 25 베어 그레이프"
+              class="w-full h-11 px-3 rounded-xl bg-toss-grey5 text-toss-dark text-xs font-medium border-none outline-none focus:ring-2 focus:ring-toss-blue/50">
+          </div>
+          <div class="space-y-1.5" id="form-count-wrap">
+            <label class="text-xs font-bold text-toss-grey1">수량</label>
+            <input type="number" id="form-count" min="1" value="1" oninput="updateOpenedCountFromStatus()"
+              class="w-full h-11 px-3 rounded-xl bg-toss-grey5 text-toss-dark text-xs font-medium border-none outline-none focus:ring-2 focus:ring-toss-blue/50 text-center">
+          </div>
+        </div>
+
+        <!-- Wish Exclusive Fields -->
+        <div id="wish-exclusive-fields" class="space-y-4 hidden pt-3 border-t border-toss-grey4/60">
+          <div class="space-y-1.5">
+            <label class="text-xs font-bold text-toss-grey1">위시 레벨 (소장 욕구)</label>
+            <div class="grid grid-cols-3 gap-2">
+              <button type="button" onclick="setWishLevel(1)" id="wish-level-btn-1" class="py-2.5 px-2 rounded-xl border border-toss-grey4 bg-white text-toss-grey2 font-semibold text-[11px] transition text-center leading-snug">
+                <span class="block text-xs font-bold mb-0.5">1단계</span>관심 있음
+              </button>
+              <button type="button" onclick="setWishLevel(2)" id="wish-level-btn-2" class="py-2.5 px-2 rounded-xl border border-toss-grey4 bg-white text-toss-grey2 font-semibold text-[11px] transition text-center leading-snug">
+                <span class="block text-xs font-bold mb-0.5">2단계</span>언젠가 살 거임
+              </button>
+              <button type="button" onclick="setWishLevel(3)" id="wish-level-btn-3" class="py-2.5 px-2 rounded-xl border border-toss-grey4 bg-white text-toss-grey2 font-semibold text-[11px] transition text-center leading-snug">
+                <span class="block text-xs font-bold mb-0.5">3단계</span>지금 사야 함
+              </button>
+            </div>
+            <input type="hidden" id="form-wish-level" value="2" />
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div class="space-y-1.5">
+              <label class="text-xs font-bold text-toss-grey1">정가 (원)</label>
+              <input type="number" id="form-original-price" placeholder="예: 18000"
+                class="w-full h-11 px-3 rounded-xl bg-toss-grey5 text-toss-dark text-xs font-medium border-none outline-none focus:ring-2 focus:ring-toss-blue/50">
+            </div>
+            <div class="space-y-1.5">
+              <label class="text-xs font-bold text-toss-grey1">고능가 (어림값)</label>
+              <input type="text" id="form-gongeung-price" placeholder="예: 15000원대"
+                class="w-full h-11 px-3 rounded-xl bg-toss-grey5 text-toss-dark text-xs font-medium border-none outline-none focus:ring-2 focus:ring-toss-blue/50">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div class="space-y-1.5">
+              <label class="text-xs font-bold text-toss-grey1">플랫폼</label>
+              <select id="form-platform" class="w-full h-11 px-3 rounded-xl bg-toss-grey5 text-toss-dark text-xs font-semibold border-none outline-none focus:ring-2 focus:ring-toss-blue/50">
+                <option value="공홈">공홈</option>
+                <option value="올영">올영</option>
+                <option value="직잭">직잭</option>
+                <option value="무신사">무신사</option>
+                <option value="에이블리">에이블리</option>
+                <option value="당근">당근</option>
+                <option value="면세">면세</option>
+                <option value="직구">직구</option>
+                <option value="현지">현지</option>
+              </select>
+            </div>
+            <div class="space-y-1.5">
+              <label class="text-xs font-bold text-toss-grey1">제품 상태</label>
+              <select id="form-wish-condition" class="w-full h-11 px-3 rounded-xl bg-toss-grey5 text-toss-dark text-xs font-semibold border-none outline-none focus:ring-2 focus:ring-toss-blue/50">
+                <option value="새제품">새제품</option>
+                <option value="중고">중고</option>
+                <option value="미개봉">미개봉</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div class="space-y-1.5">
+              <label class="text-xs font-bold text-toss-grey1">한정 / 기획 여부</label>
+              <select id="form-wish-edition" class="w-full h-11 px-3 rounded-xl bg-toss-grey5 text-toss-dark text-xs font-semibold border-none outline-none focus:ring-2 focus:ring-toss-blue/50">
+                <option value="일반">일반</option>
+                <option value="한정">한정</option>
+                <option value="기획 (툴,증정,1+1)">기획 (툴,증정,1+1)</option>
+              </select>
+            </div>
+            <div class="space-y-1.5">
+              <label class="text-xs font-bold text-toss-grey1">특이사항</label>
+              <select id="form-wish-special-tag" class="w-full h-11 px-3 rounded-xl bg-toss-grey5 text-toss-dark text-xs font-semibold border-none outline-none focus:ring-2 focus:ring-toss-blue/50">
+                <option value="세럼으로샤워가능">세럼으로샤워가능</option>
+                <option value="쓰고있는건데가격굿=쟁김">쓰고있는건데가격굿=쟁김</option>
+                <option value="기획이갖고싶어엉엉">기획이갖고싶어엉엉</option>
+                <option value="금액채우기용으로고민">금액채우기용으로고민</option>
+                <option value="드볼">드볼</option>
+                <option value="고능가라끌림">고능가라끌림</option>
+                <option value="다써감">다써감</option>
+                <option value="기타">기타</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div id="form-lip-roles-wrap" class="space-y-1.5 hidden">
+          <label class="text-xs font-bold text-toss-grey1">립 섞발 역할 (여러 개 선택 가능)</label>
+          <div class="flex flex-wrap gap-x-4 gap-y-2 text-xs text-toss-grey2">
+            <label class="flex items-center gap-1.5"><input type="checkbox" name="form-lip-role" value="립펜슬"> 립펜슬</label>
+            <label class="flex items-center gap-1.5"><input type="checkbox" name="form-lip-role" value="베이스"> 베이스</label>
+            <label class="flex items-center gap-1.5"><input type="checkbox" name="form-lip-role" value="포인트"> 포인트</label>
+          </div>
+        </div>
+        <div id="form-shadow-blush-wrap" class="hidden space-y-2">
+          <label class="flex items-center gap-2 text-xs font-semibold text-toss-grey2"><input type="checkbox" id="form-shadow-blush" onchange="toggleShadowBlushRoles()"> 블러셔 겸용으로 사용</label>
+          <div id="form-shadow-blush-roles-wrap" class="hidden space-y-1.5">
+            <label class="text-xs font-bold text-toss-grey1">블러셔 섞발 역할 (여러 개 선택 가능)</label>
+            <div class="flex flex-wrap gap-x-4 gap-y-2 text-xs text-toss-grey2">
+              <label class="flex items-center gap-1.5"><input type="checkbox" name="form-shadow-blush-role" value="베이스"> 베이스</label>
+              <label class="flex items-center gap-1.5"><input type="checkbox" name="form-shadow-blush-role" value="포인트"> 포인트</label>
+            </div>
+          </div>
+        </div>
+        <div id="form-blush-roles-wrap" class="space-y-1.5 hidden">
+          <label class="text-xs font-bold text-toss-grey1">블러셔 섞발 역할 (여러 개 선택 가능)</label>
+          <div class="flex flex-wrap gap-x-4 gap-y-2 text-xs text-toss-grey2">
+            <label class="flex items-center gap-1.5"><input type="checkbox" name="form-blush-role" value="베이스"> 베이스</label>
+            <label class="flex items-center gap-1.5"><input type="checkbox" name="form-blush-role" value="포인트"> 포인트</label>
+          </div>
+        </div>
+        <div id="form-color-type-wrap" class="hidden space-y-3">
+          <label class="text-xs font-bold text-toss-grey1">제품 타입 (선택)</label>
+          <div class="grid grid-cols-3 gap-2">
+            <select id="form-formula" class="w-full h-10 px-2 rounded-xl bg-toss-grey5 text-toss-dark text-[11px] font-semibold border-none outline-none focus:ring-2 focus:ring-toss-blue/50"><option value="">제형</option><option>크림</option><option>가루</option><option>리퀴드</option><option>스틱</option><option>젤</option><option>쿠션</option></select>
+            <select id="form-finish" class="w-full h-10 px-2 rounded-xl bg-toss-grey5 text-toss-dark text-[11px] font-semibold border-none outline-none focus:ring-2 focus:ring-toss-blue/50"><option value="">마무리</option><option>매트</option><option>새틴</option><option>글로우</option></select>
+            <select id="form-shimmer" class="w-full h-10 px-2 rounded-xl bg-toss-grey5 text-toss-dark text-[11px] font-semibold border-none outline-none focus:ring-2 focus:ring-toss-blue/50"><option value="">펄감</option><option>무펄</option><option>쉬머</option><option>글리터</option></select>
+          </div>
+        </div>
+        <div id="form-vanity-extra-fields" class="space-y-3">
+          <div class="grid grid-cols-2 gap-3">
+            <div class="space-y-1.5">
+              <label class="text-xs font-bold text-toss-grey1">개봉 수량</label>
+              <input type="number" id="form-opened-count" min="0" value="1" class="w-full h-11 px-3 rounded-xl bg-toss-grey5 text-toss-dark text-xs font-medium border-none outline-none focus:ring-2 focus:ring-toss-blue/50">
+            </div>
+            <div class="space-y-1.5">
+              <label class="text-xs font-bold text-toss-grey1">유통기한 (선택)</label>
+              <input type="date" id="form-expiry-date" class="w-full h-11 px-3 rounded-xl bg-toss-grey5 text-toss-dark text-xs font-medium border-none outline-none focus:ring-2 focus:ring-toss-blue/50">
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="space-y-1.5">
+              <label class="text-xs font-bold text-toss-grey1">단종 여부</label>
+              <select id="form-discontinued" class="w-full h-11 px-3 rounded-xl bg-toss-grey5 text-toss-dark text-xs font-semibold border-none outline-none focus:ring-2 focus:ring-toss-blue/50"><option value="false">판매 중</option><option value="true">단종</option></select>
+            </div>
+            <div class="space-y-1.5 flex flex-col justify-end gap-2 pb-2">
+              <label class="flex items-center gap-2 text-xs font-semibold text-toss-grey2"><input type="checkbox" id="form-renewed"> 리뉴얼 제품</label>
+              <label class="flex items-center gap-2 text-xs font-semibold text-toss-grey2"><input type="checkbox" id="form-has-refill"> 리필 보유</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Image Link -->
+        <div class="space-y-1.5">
+          <label class="text-xs font-bold text-toss-grey1">이미지 링크 (URL)</label>
+          <input type="url" id="form-image-url" placeholder="이미지 주소 복사 후 붙여넣기"
+            class="w-full h-11 px-3 rounded-xl bg-toss-grey5 text-toss-dark text-xs font-medium border-none outline-none focus:ring-2 focus:ring-toss-blue/50">
+        </div>
+
+        <!-- Status & Tags (Vanity) -->
+        <div class="grid grid-cols-2 gap-3" id="form-vanity-status-row">
+          <div class="space-y-1.5">
+            <label class="text-xs font-bold text-toss-grey1">개봉 상태</label>
+            <select id="form-status" onchange="updateOpenedCountFromStatus()" class="w-full h-11 px-3 rounded-xl bg-toss-grey5 text-toss-dark text-xs font-semibold border-none outline-none focus:ring-2 focus:ring-toss-blue/50">
+              <option value="개봉">개봉</option>
+              <option value="미개봉">미개봉</option>
+              <option value="혼합">개봉 + 미개봉</option>
+            </select>
+          </div>
+          <div class="space-y-1.5">
+            <label class="text-xs font-bold text-toss-grey1">태그 (쉼표로 구분)</label>
+            <input type="text" id="form-tags" placeholder="쿨톤, 매트, 데일리"
+              class="w-full h-11 px-3 rounded-xl bg-toss-grey5 text-toss-dark text-xs font-medium border-none outline-none focus:ring-2 focus:ring-toss-blue/50">
+          </div>
+        </div>
+
+        <!-- Memo -->
+        <div class="space-y-1.5">
+          <label class="text-xs font-bold text-toss-grey1">메모</label>
+          <input type="text" id="form-memo" placeholder="특이사항을 기록해주세요"
+            class="w-full h-11 px-3 rounded-xl bg-toss-grey5 text-toss-dark text-xs font-medium border-none outline-none focus:ring-2 focus:ring-toss-blue/50">
+        </div>
+
+        <!-- Submit Button Inside Scrollable Form -->
+        <button type="submit" class="w-full h-12 bg-toss-blue hover:bg-[#E05555] text-white rounded-2xl font-bold text-sm shadow-md active:scale-95 transition mt-6">
+          저장하기
+        </button>
+      </form>
+    </div>
+
+  </div>
+</div>
+
+<!-- Modal: Mix Config (Lip / Blusher) -->
+<div id="mix-config-modal" onclick="handleBackdropClick(event, 'mix-config-modal')" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center hidden opacity-0 transition-opacity duration-300 p-5">
+  <div class="w-full max-w-sm bg-white rounded-3xl p-6 shadow-toss-modal transform scale-95 transition-transform duration-300">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-base font-bold text-toss-dark" id="mix-config-title">섞발 꿀조합 설정</h3>
+      <button onclick="closeMixConfigModal()" class="w-7 h-7 rounded-full bg-toss-grey5 text-toss-grey2 flex items-center justify-center hover:text-toss-dark text-xs">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <p class="text-xs text-toss-grey2 mb-4 leading-relaxed" id="mix-config-desc">조합에 사용할 제품 개수를 선택해주세요.</p>
+
+    <div class="grid grid-cols-3 gap-2.5 mb-6">
+      <button onclick="setMixCount(2)" id="mix-btn-2" class="py-3 rounded-2xl border-2 border-toss-blue bg-[#FFF3F0] text-toss-blue font-bold text-xs transition">2개 조합</button>
+      <button onclick="setMixCount(3)" id="mix-btn-3" class="py-3 rounded-2xl border-2 border-toss-grey4 bg-white text-toss-grey2 font-bold text-xs transition">3개 조합</button>
+      <button onclick="setMixCount(4)" id="mix-btn-4" class="py-3 rounded-2xl border-2 border-toss-grey4 bg-white text-toss-grey2 font-bold text-xs transition">4개 조합</button>
+    </div>
+
+    <button onclick="executeMixRecommendation()" class="w-full h-11 bg-toss-blue hover:bg-[#E05555] text-white rounded-xl font-bold text-xs shadow-md active:scale-95 transition">
+      조합 추천받기
+    </button>
+  </div>
+</div>
+
+<!-- Modal: Result / Backup / Delete -->
+<div id="result-modal" onclick="handleBackdropClick(event, 'result-modal')" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center hidden opacity-0 transition-opacity duration-300 p-5">
+  <div class="w-full max-w-sm bg-white rounded-3xl p-6 shadow-toss-modal transform scale-95 transition-transform duration-300 text-center">
+    <div id="result-modal-icon" class="w-14 h-14 rounded-3xl bg-toss-grey5 text-toss-dark flex items-center justify-center text-xl mx-auto mb-3">
+      <i class="fa-solid fa-wand-magic-sparkles"></i>
+    </div>
+    <h3 class="text-base font-bold text-toss-dark mb-1" id="result-modal-title">결과</h3>
+    <div class="text-xs text-toss-grey2 mb-5 leading-relaxed" id="result-modal-content"></div>
+
+    <div id="result-modal-actions" class="flex gap-2 justify-end">
+      <!-- Dynamically populated action buttons -->
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notification -->
+<div id="toast" class="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-toss-dark/95 backdrop-blur-md text-white px-4 py-1.5 rounded-xl text-xs font-semibold shadow-toss-float opacity-0 pointer-events-none transition-opacity duration-300 z-50 whitespace-nowrap">
+  알림 메시지
+</div>
+
+</div>
+
+<script src="app.js" defer></script>
+
+    </body>
+
+    </html>
